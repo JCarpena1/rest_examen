@@ -44,6 +44,15 @@
 					"request": {
 						"method": "POST",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"edad\": 30,\n    \"nombre\": \"Nombre 3\"    \n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
 							"raw": "{{api}}clientes",
 							"host": [
@@ -58,6 +67,15 @@
 					"request": {
 						"method": "PUT",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"createdAt\": \"2023-01-21T12:00:00.000000Z\",\n    \"edad\": 30,\n    \"id\": 3,\n    \"nombre\": \"Nombre 3\",\n    \"updatedAt\": \"2023-01-21T12:00:00.000000Z\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
 							"raw": "{{api}}clientes/2",
 							"host": [
