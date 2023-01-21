@@ -8,8 +8,8 @@ import jakarta.ws.rs.core.Response;
  *
  * @author 
  */
-@Path("jakartaee9")
-public class JakartaEE91Resource {
+@Path("clientes")
+public class ClientesResource {
     
     @GET
     public Response ping(){
