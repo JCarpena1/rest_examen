@@ -1,0 +1,120 @@
+{
+	"info": {
+		"_postman_id": "79869c1b-3a13-40b8-9bd1-3901b88c0792",
+		"name": "restful",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Clientes",
+			"item": [
+				{
+					"name": "Clientes - Get",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api}}clientes",
+							"host": [
+								"{{api}}clientes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Clientes - Show",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api}}clientes/1",
+							"host": [
+								"{{api}}clientes"
+							],
+							"path": [
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Clientes - Post",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{api}}clientes",
+							"host": [
+								"{{api}}clientes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Clientes - Put",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{api}}clientes/2",
+							"host": [
+								"{{api}}clientes"
+							],
+							"path": [
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Clientes - Delete",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{api}}clientes/3",
+							"host": [
+								"{{api}}clientes"
+							],
+							"path": [
+								"3"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "api",
+			"value": "http://localhost:8080/rest/api/",
+			"type": "default"
+		}
+	]
+}
