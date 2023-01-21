@@ -4,37 +4,53 @@
  */
 package es.eldelbit.rest.models;
 
-import java.time.Instant;
+import jakarta.json.bind.annotation.JsonbDateFormat;
+import jakarta.json.bind.annotation.JsonbProperty;
+import jakarta.json.bind.annotation.JsonbPropertyOrder;
+import jakarta.json.bind.config.PropertyOrderStrategy;
+import java.sql.Timestamp;
 
 /**
  *
  * @author virtualbox
  */
+@JsonbPropertyOrder(PropertyOrderStrategy.ANY)
 public class Cliente {
 
-    private int id;
+    private Integer id;
+    
     private String nombre;
-    private int edad;
-    private Instant createdAt;
-    private Instant updatedAt;
+        
+    @JsonbProperty(nillable = true)
+    private Integer edad;
+    
+    private String direccion;
+    
+    @JsonbProperty("fecha_nacimiento_1")
+    private Timestamp fechaNacimiento;
+    
+    private Timestamp createdAt;
+    
+    private Timestamp updatedAt;
 
     public Cliente() {
     }
 
-    public Cliente(int id, String nombre, int edad) {
+    public Cliente(Integer id, String nombre, Integer edad, String direccion, Timestamp fechaNacimiento, Timestamp createdAt, Timestamp updatedAt) {
         this.id = id;
-        this.nombre = nombre;
+        this.nombre = nombre;       
         this.edad = edad;
-        var instant = Instant.now();
-        createdAt = instant;
-        updatedAt = instant;
+        this.direccion = direccion;
+        this.fechaNacimiento = fechaNacimiento;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -46,27 +62,44 @@ public class Cliente {
         this.nombre = nombre;
     }
 
-    public int getEdad() {
+    public Integer getEdad() {
         return edad;
     }
 
-    public void setEdad(int edad) {
+    public void setEdad(Integer edad) {
         this.edad = edad;
     }
+    
+    public String getDireccion() {
+        return direccion;
+    }
 
-    public Instant getCreatedAt() {
+    public void setDireccion(String direccion) {
+        this.direccion = direccion;
+    }
+
+    public Timestamp getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Instant createdAt) {
+    public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
     }
+    
+    public Timestamp getFechaNacimiento() {
+        return fechaNacimiento;
+    }
 
-    public Instant getUpdatedAt() {
+    public void setFechaNacimiento(Timestamp FechaNacimiento) {
+        this.fechaNacimiento = FechaNacimiento;
+    }
+
+    public Timestamp getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(Instant updatedAt) {
+    public void setUpdatedAt(Timestamp updatedAt) {
         this.updatedAt = updatedAt;
     }
+
 }

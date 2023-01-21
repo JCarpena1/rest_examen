@@ -1,5 +1,6 @@
 package es.eldelbit.rest.resources;
 
+import es.eldelbit.rest.db.DB;
 import es.eldelbit.rest.models.Cliente;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -11,9 +12,15 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import java.time.Instant;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -26,11 +33,45 @@ public class ClientesResource {
     @Produces(MediaType.APPLICATION_JSON)
     public List<Cliente> index() {
 
-        var lista = new ArrayList<Cliente>();
-        lista.add(new Cliente(1, "Nombre 1", 10));
-        lista.add(new Cliente(2, "Nombre 2", 20));
+        var clientes = new ArrayList<Cliente>();
 
-        return lista;
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+
+        try {
+
+            DB.registerDriver();
+            conn = DB.getConnection();
+            stmt = conn.createStatement();
+            
+            String sql = "SELECT id, nombre, edad, direccion, fecha_nacimiento, created_at, updated_at FROM clientes";
+            rs = stmt.executeQuery(sql);
+
+            while (rs.next()) {
+                var cliente = new Cliente(
+                        DB.getInt(rs, "id"),
+                        rs.getString("nombre"),
+                        DB.getInt(rs, "edad"),                      
+                        rs.getString("direccion"),
+                        rs.getTimestamp("fecha_nacimiento"),
+                        rs.getTimestamp("created_at"),
+                        rs.getTimestamp("updated_at")
+                );                               
+                                
+                clientes.add(cliente);
+            }
+                        
+        } catch (ClassNotFoundException | SQLException ex) {
+            Logger.getLogger(ClientesResource.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            DB.closeResultSet(rs);
+            DB.closeStatement(stmt);
+            DB.closeConnection(conn);
+        }
+
+        return clientes;
+        
     }
 
     @GET
@@ -38,7 +79,43 @@ public class ClientesResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Cliente show(@PathParam("id") int id) {
 
-        return new Cliente(1, "Nombre 1", 10);
+        Cliente cliente = null;
+
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
+        try {
+
+            DB.registerDriver();
+            conn = DB.getConnection();
+            stmt = conn.prepareStatement("SELECT id, nombre, edad, direccion, fecha_nacimiento, created_at, updated_at FROM clientes WHERE id = ?");
+            
+            stmt.setInt(1, id);
+            rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                cliente = new Cliente(
+                        DB.getInt(rs, "id"),
+                        rs.getString("nombre"),
+                        DB.getInt(rs, "edad"),
+                        rs.getString("direccion"),
+                        rs.getTimestamp("fecha_nacimiento"),
+                        rs.getTimestamp("created_at"),
+                        rs.getTimestamp("updated_at")
+                );
+
+            }
+                        
+        } catch (ClassNotFoundException | SQLException ex) {
+            Logger.getLogger(ClientesResource.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            DB.closeResultSet(rs);
+            DB.closeStatement(stmt);
+            DB.closeConnection(conn);
+        }
+
+        return cliente;
 
     }
 
@@ -48,9 +125,9 @@ public class ClientesResource {
     public Cliente store(Cliente cliente) {
 
         cliente.setId(1);
-        var instant = Instant.now();
-        cliente.setCreatedAt(instant);
-        cliente.setUpdatedAt(instant);
+        // var instant = Instant.now();
+        // cliente.setCreatedAt(instant);
+        // cliente.setUpdatedAt(instant);
 
         return cliente;
 
@@ -62,8 +139,8 @@ public class ClientesResource {
     @Path("/{id}")
     public Cliente update(@PathParam("id") int id, Cliente cliente) {
                 
-        var instant = Instant.now();        
-        cliente.setUpdatedAt(instant);
+        //var instant = Instant.now();        
+        //cliente.setUpdatedAt(instant);
 
         return cliente;
     }
