@@ -21,7 +21,7 @@ public class Cliente {
     
     private String nombre;
         
-    @JsonbProperty(nillable = true)
+    // @JsonbProperty(nillable = true)
     private Integer edad;
     
     private String direccion;

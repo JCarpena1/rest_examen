@@ -18,7 +18,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,7 +30,9 @@ public class ClientesResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Cliente> index() {
+    public Response index() {
+
+        Response.ResponseBuilder responseBuilder = Response.status(Response.Status.OK);
 
         var clientes = new ArrayList<Cliente>();
 
@@ -44,7 +45,7 @@ public class ClientesResource {
             DB.registerDriver();
             conn = DB.getConnection();
             stmt = conn.createStatement();
-            
+
             String sql = "SELECT id, nombre, edad, direccion, fecha_nacimiento, created_at, updated_at FROM clientes";
             rs = stmt.executeQuery(sql);
 
@@ -52,17 +53,20 @@ public class ClientesResource {
                 var cliente = new Cliente(
                         DB.getInt(rs, "id"),
                         rs.getString("nombre"),
-                        DB.getInt(rs, "edad"),                      
+                        DB.getInt(rs, "edad"),
                         rs.getString("direccion"),
                         rs.getTimestamp("fecha_nacimiento"),
                         rs.getTimestamp("created_at"),
                         rs.getTimestamp("updated_at")
-                );                               
-                                
+                );
+
                 clientes.add(cliente);
             }
-                        
-        } catch (ClassNotFoundException | SQLException ex) {
+
+            Thread.sleep(3000);
+
+        } catch (ClassNotFoundException | SQLException | InterruptedException ex) {
+            responseBuilder.status(Response.Status.INTERNAL_SERVER_ERROR);
             Logger.getLogger(ClientesResource.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             DB.closeResultSet(rs);
@@ -70,14 +74,16 @@ public class ClientesResource {
             DB.closeConnection(conn);
         }
 
-        return clientes;
-        
+        return responseBuilder.entity(clientes).build();
+
     }
 
     @GET
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Cliente show(@PathParam("id") int id) {
+    public Response show(@PathParam("id") int id) {
+
+        Response.ResponseBuilder responseBuilder = Response.status(Response.Status.OK);
 
         Cliente cliente = null;
 
@@ -90,7 +96,7 @@ public class ClientesResource {
             DB.registerDriver();
             conn = DB.getConnection();
             stmt = conn.prepareStatement("SELECT id, nombre, edad, direccion, fecha_nacimiento, created_at, updated_at FROM clientes WHERE id = ?");
-            
+
             stmt.setInt(1, id);
             rs = stmt.executeQuery();
 
@@ -106,8 +112,12 @@ public class ClientesResource {
                 );
 
             }
-                        
-        } catch (ClassNotFoundException | SQLException ex) {
+
+            Thread.sleep(3000);
+
+        } catch (ClassNotFoundException | SQLException | InterruptedException ex) {
+            responseBuilder.status(Response.Status.INTERNAL_SERVER_ERROR);      
+            cliente = new Cliente();
             Logger.getLogger(ClientesResource.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             DB.closeResultSet(rs);
@@ -115,8 +125,7 @@ public class ClientesResource {
             DB.closeConnection(conn);
         }
 
-        return cliente;
-
+        return responseBuilder.entity(cliente).build();
     }
 
     @POST
@@ -138,18 +147,17 @@ public class ClientesResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{id}")
     public Cliente update(@PathParam("id") int id, Cliente cliente) {
-                
+
         //var instant = Instant.now();        
         //cliente.setUpdatedAt(instant);
-
         return cliente;
     }
 
     @DELETE
     @Path("/{id}")
     public Response destroy(@PathParam("id") int id) {
-        
+
         return Response.ok("destroy " + id).build();
-        
+
     }
 }
