@@ -42,7 +42,6 @@ public class ClientesResource {
 
         try {
 
-            DB.registerDriver();
             conn = DB.getConnection();
             stmt = conn.createStatement();
 
@@ -65,7 +64,7 @@ public class ClientesResource {
 
             Thread.sleep(3000);
 
-        } catch (ClassNotFoundException | SQLException | InterruptedException ex) {
+        } catch (SQLException | InterruptedException ex) {
             responseBuilder.status(Response.Status.INTERNAL_SERVER_ERROR);
             Logger.getLogger(ClientesResource.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
@@ -93,7 +92,6 @@ public class ClientesResource {
 
         try {
 
-            DB.registerDriver();
             conn = DB.getConnection();
             stmt = conn.prepareStatement("SELECT id, nombre, edad, direccion, fecha_nacimiento, created_at, updated_at FROM clientes WHERE id = ?");
 
@@ -115,8 +113,8 @@ public class ClientesResource {
 
             Thread.sleep(3000);
 
-        } catch (ClassNotFoundException | SQLException | InterruptedException ex) {
-            responseBuilder.status(Response.Status.INTERNAL_SERVER_ERROR);      
+        } catch (SQLException | InterruptedException ex) {
+            responseBuilder.status(Response.Status.INTERNAL_SERVER_ERROR);
             cliente = new Cliente();
             Logger.getLogger(ClientesResource.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
