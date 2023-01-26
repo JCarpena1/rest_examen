@@ -33,7 +33,8 @@ public class ClientesResource {
     public Response index() {
 
         Response.ResponseBuilder responseBuilder = Response.status(Response.Status.OK);
-
+        Object entity = null;
+        
         var clientes = new ArrayList<Cliente>();
 
         Connection conn = null;
@@ -62,10 +63,13 @@ public class ClientesResource {
                 clientes.add(cliente);
             }
 
-            Thread.sleep(3000);
+            entity = clientes;
+            
+            // Thread.sleep(3000);
 
-        } catch (SQLException | InterruptedException ex) {
+        } catch (SQLException /*| InterruptedException*/ ex) {
             responseBuilder.status(Response.Status.INTERNAL_SERVER_ERROR);
+            entity = ex.getMessage();
             Logger.getLogger(ClientesResource.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             DB.closeResultSet(rs);
@@ -73,7 +77,7 @@ public class ClientesResource {
             DB.closeConnection(conn);
         }
 
-        return responseBuilder.entity(clientes).build();
+        return responseBuilder.entity(entity).build();
 
     }
 
@@ -83,6 +87,7 @@ public class ClientesResource {
     public Response show(@PathParam("id") int id) {
 
         Response.ResponseBuilder responseBuilder = Response.status(Response.Status.OK);
+        Object entity = null;
 
         Cliente cliente = null;
 
@@ -109,13 +114,19 @@ public class ClientesResource {
                         rs.getTimestamp("updated_at")
                 );
 
+                entity = cliente;
             }
 
-            Thread.sleep(3000);
+            if (entity == null) {
+                responseBuilder.status(Response.Status.NOT_FOUND);
+                entity = "not found";
+            }
+            
+            // Thread.sleep(3000);
 
-        } catch (SQLException | InterruptedException ex) {
+        } catch (SQLException /*| InterruptedException*/ ex) {
             responseBuilder.status(Response.Status.INTERNAL_SERVER_ERROR);
-            cliente = new Cliente();
+            entity = ex.getMessage();
             Logger.getLogger(ClientesResource.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             DB.closeResultSet(rs);
@@ -123,20 +134,89 @@ public class ClientesResource {
             DB.closeConnection(conn);
         }
 
-        return responseBuilder.entity(cliente).build();
+        return responseBuilder.entity(entity).build();
     }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Cliente store(Cliente cliente) {
+    public Response store(Cliente cliente) {
 
-        cliente.setId(1);
-        // var instant = Instant.now();
-        // cliente.setCreatedAt(instant);
-        // cliente.setUpdatedAt(instant);
+        Response.ResponseBuilder responseBuilder = Response.status(Response.Status.OK);
+        Object entity = null;
 
-        return cliente;
+        Connection conn = null;
+
+        PreparedStatement stmtIns = null;
+
+        ResultSet rsKeys = null;
+        int id = 0;
+
+        PreparedStatement stmtSel = null;
+        ResultSet rsSel = null;
+
+        try {
+
+            conn = DB.getConnection();
+
+            // insertar
+            stmtIns = conn.prepareStatement("INSERT INTO clientes (nombre, edad, direccion, fecha_nacimiento) VALUES (?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
+
+            stmtIns.setString(1, cliente.getNombre());
+            stmtIns.setObject(2, cliente.getEdad());
+            stmtIns.setString(3, cliente.getDireccion());
+            stmtIns.setTimestamp(4, cliente.getFechaNacimiento());
+
+            if (stmtIns.executeUpdate() == 1) {
+
+                responseBuilder.status(Response.Status.CREATED);
+
+                // obtener id
+                rsKeys = stmtIns.getGeneratedKeys();
+                while (rsKeys.next()) {
+                    id = rsKeys.getInt(1);
+                }
+            }
+
+            // obtener datos
+            if (id > 0) {
+
+                stmtSel = conn.prepareStatement("SELECT id, nombre, edad, direccion, fecha_nacimiento, created_at, updated_at FROM clientes WHERE id = ?");
+
+                stmtSel.setInt(1, id);
+                rsSel = stmtSel.executeQuery();
+
+                if (rsSel.next()) {
+                    cliente = new Cliente(
+                            DB.getInt(rsSel, "id"),
+                            rsSel.getString("nombre"),
+                            DB.getInt(rsSel, "edad"),
+                            rsSel.getString("direccion"),
+                            rsSel.getTimestamp("fecha_nacimiento"),
+                            rsSel.getTimestamp("created_at"),
+                            rsSel.getTimestamp("updated_at")
+                    );
+
+                    entity = cliente;
+                }
+            }
+
+            // Thread.sleep(3000);
+        } catch (SQLException /*| InterruptedException*/ ex) {
+            responseBuilder.status(Response.Status.INTERNAL_SERVER_ERROR);
+            entity = ex.getMessage();
+            Logger.getLogger(ClientesResource.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            DB.closeResultSet(rsSel);
+            DB.closeStatement(stmtSel);
+
+            DB.closeResultSet(rsKeys);
+
+            DB.closeStatement(stmtIns);
+            DB.closeConnection(conn);
+        }
+
+        return responseBuilder.entity(entity).build();
 
     }
 
@@ -144,18 +224,116 @@ public class ClientesResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{id}")
-    public Cliente update(@PathParam("id") int id, Cliente cliente) {
+    public Response update(@PathParam("id") int id, Cliente cliente) {
 
-        //var instant = Instant.now();        
-        //cliente.setUpdatedAt(instant);
-        return cliente;
+        Response.ResponseBuilder responseBuilder = Response.status(Response.Status.OK);
+        Object entity = null;
+
+        Connection conn = null;
+
+        PreparedStatement stmtIns = null;
+
+        PreparedStatement stmtSel = null;
+        ResultSet rsSel = null;
+
+        try {
+
+            conn = DB.getConnection();
+
+            // modificar
+            stmtIns = conn.prepareStatement("UPDATE clientes SET nombre = ?, edad = ?, direccion = ?, fecha_nacimiento = ? WHERE id = ?");
+
+            stmtIns.setString(1, cliente.getNombre());
+            stmtIns.setObject(2, cliente.getEdad());
+            stmtIns.setString(3, cliente.getDireccion());
+            stmtIns.setTimestamp(4, cliente.getFechaNacimiento());
+            stmtIns.setInt(5, id);
+
+            if (stmtIns.executeUpdate() == 1) {
+
+                // obtener datos
+                stmtSel = conn.prepareStatement("SELECT id, nombre, edad, direccion, fecha_nacimiento, created_at, updated_at FROM clientes WHERE id = ?");
+
+                stmtSel.setInt(1, id);
+                rsSel = stmtSel.executeQuery();
+
+                if (rsSel.next()) {
+                    cliente = new Cliente(
+                            DB.getInt(rsSel, "id"),
+                            rsSel.getString("nombre"),
+                            DB.getInt(rsSel, "edad"),
+                            rsSel.getString("direccion"),
+                            rsSel.getTimestamp("fecha_nacimiento"),
+                            rsSel.getTimestamp("created_at"),
+                            rsSel.getTimestamp("updated_at")
+                    );
+
+                    entity = cliente;
+                }
+            }
+
+            if (entity == null) {
+                responseBuilder.status(Response.Status.NOT_FOUND);
+                entity = "not found";
+            }
+
+            // Thread.sleep(3000);
+        } catch (SQLException /*| InterruptedException*/ ex) {
+            responseBuilder.status(Response.Status.INTERNAL_SERVER_ERROR);
+            entity = ex.getMessage();
+            Logger.getLogger(ClientesResource.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            DB.closeResultSet(rsSel);
+            DB.closeStatement(stmtSel);
+
+            DB.closeStatement(stmtIns);
+            DB.closeConnection(conn);
+        }
+
+        return responseBuilder.entity(entity).build();
     }
 
     @DELETE
     @Path("/{id}")
     public Response destroy(@PathParam("id") int id) {
 
-        return Response.ok("destroy " + id).build();
+        Response.ResponseBuilder responseBuilder = Response.status(Response.Status.OK);
+        Object entity = null;
+
+        Connection conn = null;
+
+        PreparedStatement stmtDel = null;
+
+        try {
+
+            conn = DB.getConnection();
+
+            // borrar
+            stmtDel = conn.prepareStatement("DELETE FROM clientes WHERE id = ?");
+
+            stmtDel.setInt(1, id);
+
+            if (stmtDel.executeUpdate() == 1) {
+                responseBuilder.status(Response.Status.NO_CONTENT);
+                entity = "";
+            }
+
+            if (entity == null) {
+                responseBuilder.status(Response.Status.NOT_FOUND);
+                entity = "not found";
+            }
+
+            // Thread.sleep(3000);
+        } catch (SQLException /*| InterruptedException*/ ex) {
+            responseBuilder.status(Response.Status.INTERNAL_SERVER_ERROR);
+            entity = ex.getMessage();
+            Logger.getLogger(ClientesResource.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {            
+            DB.closeStatement(stmtDel);
+            DB.closeConnection(conn);
+        }
+
+        return responseBuilder.entity(entity).build();
 
     }
 }

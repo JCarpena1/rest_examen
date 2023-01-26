@@ -4,7 +4,6 @@
  */
 package es.eldelbit.rest.models;
 
-import jakarta.json.bind.annotation.JsonbDateFormat;
 import jakarta.json.bind.annotation.JsonbProperty;
 import jakarta.json.bind.annotation.JsonbPropertyOrder;
 import jakarta.json.bind.config.PropertyOrderStrategy;
@@ -21,16 +20,17 @@ public class Cliente {
     
     private String nombre;
         
-    // @JsonbProperty(nillable = true)
     private Integer edad;
     
     private String direccion;
     
-    @JsonbProperty("fecha_nacimiento_1")
+    @JsonbProperty("fecha_nacimiento")
     private Timestamp fechaNacimiento;
     
+    @JsonbProperty("created_at")
     private Timestamp createdAt;
     
+    @JsonbProperty("updated_at")
     private Timestamp updatedAt;
 
     public Cliente() {
