@@ -158,6 +158,8 @@ public class ClientesResource {
         try {
 
             conn = DB.getConnection();
+            
+            conn.setAutoCommit(false);
 
             // insertar
             stmtIns = conn.prepareStatement("INSERT INTO clientes (nombre, edad, direccion, fecha_nacimiento) VALUES (?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
@@ -201,8 +203,11 @@ public class ClientesResource {
                 }
             }
 
+            conn.commit();
+            
             // Thread.sleep(3000);
         } catch (SQLException /*| InterruptedException*/ ex) {
+            DB.rollback(conn);
             responseBuilder.status(Response.Status.INTERNAL_SERVER_ERROR);
             entity = ex.getMessage();
             Logger.getLogger(ClientesResource.class.getName()).log(Level.SEVERE, null, ex);
@@ -239,6 +244,8 @@ public class ClientesResource {
         try {
 
             conn = DB.getConnection();
+            
+            conn.setAutoCommit(false);
 
             // modificar
             stmtIns = conn.prepareStatement("UPDATE clientes SET nombre = ?, edad = ?, direccion = ?, fecha_nacimiento = ? WHERE id = ?");
@@ -276,9 +283,12 @@ public class ClientesResource {
                 responseBuilder.status(Response.Status.NOT_FOUND);
                 entity = "not found";
             }
+            
+            conn.commit();
 
             // Thread.sleep(3000);
         } catch (SQLException /*| InterruptedException*/ ex) {
+            DB.rollback(conn);
             responseBuilder.status(Response.Status.INTERNAL_SERVER_ERROR);
             entity = ex.getMessage();
             Logger.getLogger(ClientesResource.class.getName()).log(Level.SEVERE, null, ex);
@@ -307,6 +317,8 @@ public class ClientesResource {
         try {
 
             conn = DB.getConnection();
+            
+            conn.setAutoCommit(false);
 
             // borrar
             stmtDel = conn.prepareStatement("DELETE FROM clientes WHERE id = ?");
@@ -323,8 +335,11 @@ public class ClientesResource {
                 entity = "not found";
             }
 
+            conn.commit();
+            
             // Thread.sleep(3000);
         } catch (SQLException /*| InterruptedException*/ ex) {
+            DB.rollback(conn);
             responseBuilder.status(Response.Status.INTERNAL_SERVER_ERROR);
             entity = ex.getMessage();
             Logger.getLogger(ClientesResource.class.getName()).log(Level.SEVERE, null, ex);

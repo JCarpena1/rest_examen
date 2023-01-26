@@ -123,6 +123,17 @@ public class DB {
         }
 
     }
+    
+    public static void rollback(Connection conn) {
+
+        if (conn != null) {
+            try {                
+                conn.rollback();
+            } catch (SQLException sqlEx) {
+            }
+        }
+
+    }
 
     public static Integer getInt(ResultSet rs, String field) throws SQLException {
 
