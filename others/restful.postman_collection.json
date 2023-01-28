@@ -1,8 +1,9 @@
 {
 	"info": {
-		"_postman_id": "79869c1b-3a13-40b8-9bd1-3901b88c0792",
+		"_postman_id": "a8908fea-74b1-4ddf-80ed-55d220020368",
 		"name": "restful",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "9204254"
 	},
 	"item": [
 		{
@@ -165,6 +166,104 @@
 							],
 							"path": [
 								"9"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Varios",
+			"item": [
+				{
+					"name": "Call Procedure",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Check Status\", function(){",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api}}varios/call_procedure/Ana",
+							"host": [
+								"{{api}}varios"
+							],
+							"path": [
+								"call_procedure",
+								"Ana"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Call Function",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Check Status\", function(){",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api}}varios/call_function/Ana",
+							"host": [
+								"{{api}}varios"
+							],
+							"path": [
+								"call_function",
+								"Ana"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Script",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Check Status\", function(){",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api}}varios/call_function/Ana",
+							"host": [
+								"{{api}}varios"
+							],
+							"path": [
+								"call_function",
+								"Ana"
 							]
 						}
 					},

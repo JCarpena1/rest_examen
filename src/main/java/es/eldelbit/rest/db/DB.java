@@ -33,7 +33,7 @@ public class DB {
 
         String url = protocol + hosts + ":" + port + "/" + database;
 
-        String username = "root";
+        String username = "acceso_a_datos";
         String password = "changeme";
 
         int minIdle = 3;
@@ -43,10 +43,11 @@ public class DB {
         DB.registerDriver();
 
         // BasicDataSource
-        dataSource.setUrl(url + "?useSSL=false");
+        dataSource.setUrl(url + "?allowMultiQueries=true&useSSL=false");
         dataSource.setUsername(username);
         dataSource.setPassword(password);
 
+        dataSource.setInitialSize(minIdle);
         dataSource.setMinIdle(minIdle);
         dataSource.setMaxIdle(maxIdle);
         dataSource.setMaxTotal(maxTotal);
