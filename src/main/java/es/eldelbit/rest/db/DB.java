@@ -40,13 +40,12 @@ public class DB {
         int maxIdle = 6;
         int maxTotal = 10;
 
-        DB.registerDriver();
-
         // BasicDataSource
         dataSource.setUrl(url + "?allowMultiQueries=true&useSSL=false");
         dataSource.setUsername(username);
         dataSource.setPassword(password);
 
+        dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
         dataSource.setInitialSize(minIdle);
         dataSource.setMinIdle(minIdle);
         dataSource.setMaxIdle(maxIdle);
@@ -74,16 +73,6 @@ public class DB {
 
         dataSource = new PoolingDataSource<>(connectionPool);
          */
-    }
-
-    private static void registerDriver() {
-
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(DB.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
     }
 
     public static Connection getConnection() throws SQLException {
@@ -124,11 +113,11 @@ public class DB {
         }
 
     }
-    
+
     public static void rollback(Connection conn) {
 
         if (conn != null) {
-            try {                
+            try {
                 conn.rollback();
             } catch (SQLException sqlEx) {
             }
