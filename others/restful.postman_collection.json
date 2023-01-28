@@ -257,6 +257,36 @@
 						"method": "GET",
 						"header": [],
 						"url": {
+							"raw": "{{api}}varios/script",
+							"host": [
+								"{{api}}varios"
+							],
+							"path": [
+								"script"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Resultset Actualizable",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Check Status\", function(){",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
 							"raw": "{{api}}varios/call_function/Ana",
 							"host": [
 								"{{api}}varios"
