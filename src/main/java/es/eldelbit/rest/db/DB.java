@@ -34,7 +34,7 @@ public class DB {
         String url = protocol + hosts + ":" + port + "/" + database;
 
         String username = "acceso_a_datos";
-        String password = "changeme";
+        String password = "Changeme_23";
 
         int minIdle = 3;
         int maxIdle = 6;
