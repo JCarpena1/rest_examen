@@ -7,16 +7,24 @@ package es.eldelbit.rest.models;
 import jakarta.json.bind.annotation.JsonbProperty;
 import jakarta.json.bind.annotation.JsonbPropertyOrder;
 import jakarta.json.bind.config.PropertyOrderStrategy;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 /**
  *
  * @author virtualbox
  */
+@Entity
+@Table(name = "clientes")
 @JsonbPropertyOrder(PropertyOrderStrategy.ANY)
-public class Cliente {
+public class Cliente implements Serializable {
 
-    private Integer id;
+    @Id
+    private Long id;
     
     private String nombre;
         
@@ -24,19 +32,22 @@ public class Cliente {
     
     private String direccion;
     
+    @Column(name = "fecha_nacimiento")
     @JsonbProperty("fecha_nacimiento")
     private Timestamp fechaNacimiento;
     
+    @Column(name = "created_at")
     @JsonbProperty("created_at")
     private Timestamp createdAt;
     
+    @Column(name = "updated_at")
     @JsonbProperty("updated_at")
     private Timestamp updatedAt;
 
     public Cliente() {
     }
 
-    public Cliente(Integer id, String nombre, Integer edad, String direccion, Timestamp fechaNacimiento, Timestamp createdAt, Timestamp updatedAt) {
+    public Cliente(Long id, String nombre, Integer edad, String direccion, Timestamp fechaNacimiento, Timestamp createdAt, Timestamp updatedAt) {
         this.id = id;
         this.nombre = nombre;       
         this.edad = edad;
@@ -46,11 +57,11 @@ public class Cliente {
         this.updatedAt = updatedAt;
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

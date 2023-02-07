@@ -18,7 +18,6 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.sql.CallableStatement;
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -235,7 +234,7 @@ public class Varios {
             // recorrer datos
             rs.beforeFirst();
             while (rs.next()) {
-                var id = DB.getInt(rs, "id");
+                var id = DB.getLong(rs, "id");
 
                 // modificación
                 if (id % 2 == 0) {

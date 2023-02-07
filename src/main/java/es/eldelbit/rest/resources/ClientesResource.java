@@ -2,6 +2,9 @@ package es.eldelbit.rest.resources;
 
 import es.eldelbit.rest.db.DB;
 import es.eldelbit.rest.models.Cliente;
+import es.eldelbit.rest.services.ClienteService;
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
@@ -17,7 +20,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,7 +28,11 @@ import java.util.logging.Logger;
  * @author
  */
 @Path("clientes")
+@RequestScoped
 public class ClientesResource {
+
+    @Inject
+    private ClienteService clienteService;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -34,47 +40,18 @@ public class ClientesResource {
 
         Response.ResponseBuilder responseBuilder = Response.status(Response.Status.OK);
         Object entity = null;
-        
-        var clientes = new ArrayList<Cliente>();
-
-        Connection conn = null;
-        Statement stmt = null;
-        ResultSet rs = null;
 
         try {
 
-            conn = DB.getConnection();
-            stmt = conn.createStatement();
+            entity = clienteService.get();
 
-            String sql = "SELECT id, nombre, edad, direccion, fecha_nacimiento, created_at, updated_at FROM clientes";
-            rs = stmt.executeQuery(sql);
-
-            while (rs.next()) {
-                var cliente = new Cliente(
-                        DB.getInt(rs, "id"),
-                        rs.getString("nombre"),
-                        DB.getInt(rs, "edad"),
-                        rs.getString("direccion"),
-                        rs.getTimestamp("fecha_nacimiento"),
-                        rs.getTimestamp("created_at"),
-                        rs.getTimestamp("updated_at")
-                );
-
-                clientes.add(cliente);
-            }
-
-            entity = clientes;
-            
             // Thread.sleep(3000);
-
-        } catch (SQLException /*| InterruptedException*/ ex) {
+        } catch (Exception /*| InterruptedException*/ ex) {
             responseBuilder.status(Response.Status.INTERNAL_SERVER_ERROR);
             entity = ex.getMessage();
             Logger.getLogger(ClientesResource.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
-            DB.closeResultSet(rs);
-            DB.closeStatement(stmt);
-            DB.closeConnection(conn);
+
         }
 
         return responseBuilder.entity(entity).build();
@@ -84,54 +61,27 @@ public class ClientesResource {
     @GET
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response show(@PathParam("id") int id) {
+    public Response show(@PathParam("id") long id) {
 
         Response.ResponseBuilder responseBuilder = Response.status(Response.Status.OK);
         Object entity = null;
 
-        Cliente cliente = null;
-
-        Connection conn = null;
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
-
         try {
 
-            conn = DB.getConnection();
-            stmt = conn.prepareStatement("SELECT id, nombre, edad, direccion, fecha_nacimiento, created_at, updated_at FROM clientes WHERE id = ?");
-
-            stmt.setInt(1, id);
-            rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                cliente = new Cliente(
-                        DB.getInt(rs, "id"),
-                        rs.getString("nombre"),
-                        DB.getInt(rs, "edad"),
-                        rs.getString("direccion"),
-                        rs.getTimestamp("fecha_nacimiento"),
-                        rs.getTimestamp("created_at"),
-                        rs.getTimestamp("updated_at")
-                );
-
-                entity = cliente;
-            }
+            entity = clienteService.find(id);
 
             if (entity == null) {
                 responseBuilder.status(Response.Status.NOT_FOUND);
                 entity = "not found";
             }
-            
-            // Thread.sleep(3000);
 
-        } catch (SQLException /*| InterruptedException*/ ex) {
+            // Thread.sleep(3000);
+        } catch (Exception /*| InterruptedException*/  ex) {
             responseBuilder.status(Response.Status.INTERNAL_SERVER_ERROR);
             entity = ex.getMessage();
             Logger.getLogger(ClientesResource.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
-            DB.closeResultSet(rs);
-            DB.closeStatement(stmt);
-            DB.closeConnection(conn);
+
         }
 
         return responseBuilder.entity(entity).build();
@@ -158,7 +108,7 @@ public class ClientesResource {
         try {
 
             conn = DB.getConnection();
-            
+
             conn.setAutoCommit(false);
 
             // insertar
@@ -190,7 +140,7 @@ public class ClientesResource {
 
                 if (rsSel.next()) {
                     cliente = new Cliente(
-                            DB.getInt(rsSel, "id"),
+                            DB.getLong(rsSel, "id"),
                             rsSel.getString("nombre"),
                             DB.getInt(rsSel, "edad"),
                             rsSel.getString("direccion"),
@@ -204,7 +154,7 @@ public class ClientesResource {
             }
 
             conn.commit();
-            
+
             // Thread.sleep(3000);
         } catch (SQLException /*| InterruptedException*/ ex) {
             DB.rollback(conn);
@@ -244,7 +194,7 @@ public class ClientesResource {
         try {
 
             conn = DB.getConnection();
-            
+
             conn.setAutoCommit(false);
 
             // modificar
@@ -266,7 +216,7 @@ public class ClientesResource {
 
                 if (rsSel.next()) {
                     cliente = new Cliente(
-                            DB.getInt(rsSel, "id"),
+                            DB.getLong(rsSel, "id"),
                             rsSel.getString("nombre"),
                             DB.getInt(rsSel, "edad"),
                             rsSel.getString("direccion"),
@@ -283,7 +233,7 @@ public class ClientesResource {
                 responseBuilder.status(Response.Status.NOT_FOUND);
                 entity = "not found";
             }
-            
+
             conn.commit();
 
             // Thread.sleep(3000);
@@ -317,7 +267,7 @@ public class ClientesResource {
         try {
 
             conn = DB.getConnection();
-            
+
             conn.setAutoCommit(false);
 
             // borrar
@@ -336,14 +286,14 @@ public class ClientesResource {
             }
 
             conn.commit();
-            
+
             // Thread.sleep(3000);
         } catch (SQLException /*| InterruptedException*/ ex) {
             DB.rollback(conn);
             responseBuilder.status(Response.Status.INTERNAL_SERVER_ERROR);
             entity = ex.getMessage();
             Logger.getLogger(ClientesResource.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {            
+        } finally {
             DB.closeStatement(stmtDel);
             DB.closeConnection(conn);
         }

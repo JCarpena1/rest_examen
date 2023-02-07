@@ -8,8 +8,6 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.commons.dbcp2.BasicDataSource;
 
 /**
@@ -128,6 +126,16 @@ public class DB {
     public static Integer getInt(ResultSet rs, String field) throws SQLException {
 
         Integer value = rs.getInt(field);
+        if (rs.wasNull()) {
+            value = null;
+        }
+        return value;
+
+    }
+    
+    public static Long getLong(ResultSet rs, String field) throws SQLException {
+
+        Long value = rs.getLong(field);
         if (rs.wasNull()) {
             value = null;
         }
